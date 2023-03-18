@@ -1,10 +1,16 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule } from '@nestjs/swagger';
 
-import { AppModule } from '@app/app.module';
+import { MainModule } from './main.module';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
-}
+import generateSwaggerDocument from '@app/infrastructure/swagger/swagger.generator';
 
-bootstrap();
+(async () => {
+  const app = await NestFactory.create(MainModule);
+
+  SwaggerModule.setup('docs', app, generateSwaggerDocument(app), {
+    swaggerOptions: { persistAuthorization: true },
+  });
+
+  await app.listen(process.env.APP_PORT || 3000, '' + '0.0.0.0');
+})();
